@@ -22,6 +22,7 @@ void* readBlock(int sock, int len) {
 	void *p = buffer;
 	while(len>0) {
 		int rsize = read(sock, p, len);
+		printf("rsize = %d\n",rsize);
 		len-=rsize;
 		p+=rsize;
 	}
