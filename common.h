@@ -56,6 +56,7 @@ Package recvPackage( int sock) {
 	Package ans;
 	ans.size = receiveInt(sock);
 	ans.block = readBlock(sock, ans.size);
+	printf("received %d bytes data",ans.size);
 	return ans;
 }
 

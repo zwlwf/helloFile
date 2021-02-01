@@ -61,7 +61,7 @@ Package queue_pop(queue* q) {
 	}
 	Package ans = q->data[q->l];
 	q->l++;
-	if(q->l >= q->capacity) q->l%q->capacity;
+	if(q->l >= q->capacity) q->l%=q->capacity;
 	q->size--;
 	return ans;
 }
