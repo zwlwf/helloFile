@@ -114,38 +114,6 @@ void helper() {
 	printf("Useage : pushFile file1 [file2, [file3..]] \n");
 }
 
-void work(void* block) {
-	uint32_t fnum;
-	uint32_t pos = 0;
-	memcpy((void *)&fnum, block, sizeof(uint32_t));
-	fnum = ntohl(fnum);
-	printf("file numbers = %u\n", fnum);
-	if(fnum>10) return;
-	pos+=sizeof(uint32_t);
-	fdata fd;
-	char fname[200];
-	for(int i=0; i<fnum; i++) {
-		memcpy((void*)&fd, block+pos, sizeof(fdata));
-		pos+=sizeof(fdata);
-		fd.nameSize = ntohl(fd.nameSize);
-		fd.dataSize = ntohl(fd.dataSize);
-		memcpy(fname, block+pos, fd.nameSize);
-		fname[fd.nameSize] = '\0';
-		printf("reading file: %s\n", fname);
-		pos+=fd.nameSize;
-		// write the data of bloc to file?
-		FILE *fp = fopen(fname, "wb");
-		if(fp) {
-			fwrite(block+pos, fd.dataSize, sizeof(void), fp);
-		}
-		else {
-			printf("can not open file for writing\n");
-		}
-		fclose(fp);
-		pos+=fd.dataSize;
-	}
-}
-
 int main(int argc, char** argv)
 {
 	WSADATA wsaData;
@@ -191,12 +159,14 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	if ( strcmp(argv[1], "push") == 0) 
+	u_long iMode=1;ioctlsocket(ConnectSocket,FIONBIO,&iMode);
+//	if ( strcmp(argv[1], "push") == 0) 
+#ifdef PUSH
 		push(ConnectSocket, argc-2, argv+2);
-	else if ( strcmp( argv[1], "pull") == 0) 
+#else
+	//else if ( strcmp( argv[1], "pull") == 0) 
 		pull(ConnectSocket);
-	else 
-		helper();
+#endif
 
 	return 0;
 }
