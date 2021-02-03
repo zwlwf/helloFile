@@ -45,6 +45,7 @@ typedef struct {
 } Package;
 
 void sendPackage( int sock, Package p ) {
+	printf("sending %d bytes\n", p.size);
 	sendInt(sock, p.size);
 	if( p.size!=0 )
 	{
