@@ -1,0 +1,6 @@
+all : push pull
+
+push : client_win.c
+	gcc client_win.c -o push.exe -std=c99 -lWs2_32 -DPUSH -g
+pull : client_win.c
+	gcc client_win.c -o pull.exe -std=c99 -lWs2_32 -g
