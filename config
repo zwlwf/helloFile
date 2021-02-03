@@ -1,2 +1,2 @@
-ip = 47.104.98.157
-port = 6667
+ip = xxx   // fill your server's IP here!
+port = 6667  // default port
