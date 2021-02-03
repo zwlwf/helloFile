@@ -38,7 +38,7 @@ char dealWithInput(int argc, char** argv) {
 }
 
 int sayHello( int sock, char c ) {
-	return send(sock, (void*) &c, 1, MSG_DONTWAIT);
+	return send(sock, (void*) &c, 1, 0);
 }
 
 Package tar(int n, char** fnames) {

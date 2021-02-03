@@ -31,7 +31,7 @@ void* readBlock(int sock, int len) {
 
 int sendInt( int sock, int a) {
 	int b = htonl(a);
-	return send(sock, (void*)&b, sizeof(int),  MSG_DONTWAIT);
+	return send(sock, (void*)&b, sizeof(int),  0);
 }
 
 int sendBlock(int sock, void*block, int  len) {
