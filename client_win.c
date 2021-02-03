@@ -10,8 +10,6 @@ const char PUSHCHAR = '1';
 const char PULLCHAR = '0';
 
 void sendInt(int sock, int a) {
-	//int send_buffer = 1;    
-	//setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&send_buffer, sizeof(int));
 	int b = htonl(a);
 	int nwrite = send(sock, (void*)&b, sizeof(int), 0);
 	if( nwrite== -1 ) {
@@ -22,13 +20,9 @@ void sendInt(int sock, int a) {
 			return;
 		}
 	}
-	//send_buffer = 64*1024; // set back
-	//setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&send_buffer, 1);
 }
 
 void sendChar(int sock, char c) {
-	//int send_buffer = 1;    // 64 KB
-	//setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&send_buffer, 1);
 	int nwrite = send(sock, (void*)&c, sizeof(char), 0);
 	if( nwrite== -1 ) {
 		if(EINTR == errno || EWOULDBLOCK == errno || EAGAIN == errno ) {
@@ -38,8 +32,6 @@ void sendChar(int sock, char c) {
 			return;
 		}
 	}
-	//send_buffer = 64*1024;;
-	//setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&send_buffer, 1);
 }
 
 const int MSG_DONTWAIT = 0;
@@ -67,8 +59,8 @@ static void* readBlock(int client_sock, int len) {
 
 void pull(int sock) {
 	// 想拉东西前，跟服务器打个招呼
-	int send_buffer = 0;
-	setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&send_buffer, 1);
+	//int send_buffer = 0;
+	//setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&send_buffer, 1);
 	sendChar(sock, PULLCHAR); // 这里应该是client就一个字符没发出去，导致server没收到，对于push，最后sock已经关闭了，没有这个问题，pull有个这个问题。
     int bufferSize = receiveInt(sock);
 	void* block = readBlock(sock, bufferSize);
