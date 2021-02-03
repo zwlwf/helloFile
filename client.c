@@ -14,4 +14,5 @@ int main(int argc, char** argv) {
 		untar(p); // 解压包，进一步处理
 		printf("------- pull over ------- \n");
 	}
+	close(sock);
 }
