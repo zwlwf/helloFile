@@ -4,8 +4,43 @@
 #include <IPHlpApi.h>
 #include <stdio.h>
 #pragma comment(lib, "Ws2_32.lib")
-#define DEFAULT_PORT "6666"
+#define DEFAULT_PORT "6667"
 typedef unsigned int uint32_t;
+const char PUSHCHAR = '1';
+const char PULLCHAR = '0';
+
+void sendInt(int sock, int a) {
+	//int send_buffer = 1;    
+	//setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&send_buffer, sizeof(int));
+	int b = htonl(a);
+	int nwrite = send(sock, (void*)&b, sizeof(int), 0);
+	if( nwrite== -1 ) {
+		if(EINTR == errno || EWOULDBLOCK == errno || EAGAIN == errno ) {
+			nwrite = 0;
+		} else {
+			printf("%s,%d, Send() -1, 0x%x\n", __FILE__, __LINE__, errno);
+			return;
+		}
+	}
+	//send_buffer = 64*1024; // set back
+	//setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&send_buffer, 1);
+}
+
+void sendChar(int sock, char c) {
+	//int send_buffer = 1;    // 64 KB
+	//setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&send_buffer, 1);
+	int nwrite = send(sock, (void*)&c, sizeof(char), 0);
+	if( nwrite== -1 ) {
+		if(EINTR == errno || EWOULDBLOCK == errno || EAGAIN == errno ) {
+			nwrite = 0;
+		} else {
+			printf("%s,%d, Send() -1, 0x%x\n", __FILE__, __LINE__, errno);
+			return;
+		}
+	}
+	//send_buffer = 64*1024;;
+	//setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&send_buffer, 1);
+}
 
 const int MSG_DONTWAIT = 0;
 typedef struct _fdata {
@@ -32,8 +67,9 @@ static void* readBlock(int client_sock, int len) {
 
 void pull(int sock) {
 	// 想拉东西前，跟服务器打个招呼
-	send(sock, "0", 1, MSG_DONTWAIT);
-
+	int send_buffer = 0;
+	setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&send_buffer, 1);
+	sendChar(sock, PULLCHAR); // 这里应该是client就一个字符没发出去，导致server没收到，对于push，最后sock已经关闭了，没有这个问题，pull有个这个问题。
     int bufferSize = receiveInt(sock);
 	void* block = readBlock(sock, bufferSize);
 	uint32_t fnum;
@@ -101,10 +137,11 @@ int push(int sock, int n, char** fnames) {
 		fclose(fp);
 	}
 
-	uint32_t tn = htonl( bufferSize);
-	send(sock, "1", 1, MSG_DONTWAIT);
-	send(sock, (void*)&tn , sizeof(int), MSG_DONTWAIT);
+	sendChar(sock, PUSHCHAR);
+	sendInt(sock, bufferSize);
 	int nWrite = send(sock, buffer, bufferSize, 0 );
+	printf("send by windows %d bytes\n", nWrite);
+	printf("I am ok here!\n");
 	free(buffer);
 	free(fSize);
 
@@ -159,14 +196,18 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	u_long iMode=1;ioctlsocket(ConnectSocket,FIONBIO,&iMode);
+	//int send_buffer = 1;;
+	//setsockopt(ConnectSocket, SOL_SOCKET, SO_SNDBUF, (char*)&send_buffer, 1);
 //	if ( strcmp(argv[1], "push") == 0) 
 #ifdef PUSH
-		push(ConnectSocket, argc-2, argv+2);
+		printf("I am push now \n");
+		push(ConnectSocket, argc-1, argv+1);
 #else
 	//else if ( strcmp( argv[1], "pull") == 0) 
+		printf("I am pull now \n");
 		pull(ConnectSocket);
 #endif
+	closesocket(ConnectSocket);
 
 	return 0;
 }
