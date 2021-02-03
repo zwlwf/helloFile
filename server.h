@@ -8,7 +8,7 @@ int createSock_srv(){
 	memset(&addr, 0, sizeof(addr) );
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = htonl( INADDR_ANY );
-	addr.sin_port = htons( 6666 );
+	addr.sin_port = htons( 6667 );
 	bind(sock, (struct sockaddr*)&addr, sizeof(addr) );
 	listen(sock, 20); 
 	return sock;
