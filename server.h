@@ -9,15 +9,28 @@ int createSock_srv(){
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = htonl( INADDR_ANY );
 	addr.sin_port = htons( 6667 );
-	bind(sock, (struct sockaddr*)&addr, sizeof(addr) );
-	listen(sock, 20); 
+	int err = bind(sock, (struct sockaddr*)&addr, sizeof(addr) );
+	if(err<0) {
+		printf("bind error \n");
+		exit(-1);
+	}
+	err = listen(sock, 20); 
+	if(err<0) {
+		printf("listen error \n");
+		exit(-1);
+	}
 	return sock;
 }
 
 int waitConnect( int sock ) {
 	struct sockaddr_in client_addr;
 	int client_addr_size;
-	int client_sock = accept(sock, (struct sockaddr*)&client_addr, &client_addr_size);
+	int client_sock = -1;
+	while(1) {
+		client_sock = accept(sock, (struct sockaddr*)&client_addr, &client_addr_size);
+		if( client_sock >=0 ) break;
+	}
+
 	return client_sock;
 }
 
