@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <ctype.h>
 
+#include "config.h"
 const char PUSHCHAR = '1';
 const char PULLCHAR = '0';
 
