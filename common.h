@@ -38,7 +38,12 @@ int sendInt( int sock, int a) {
 
 int sendBlock(int sock, void*block, int  len) {
 	// some work may do for optimization
-	return send(sock, block, len, 0);
+	while(len>0) {
+		int wsize = send(sock, block, len, 0);
+		len -= wsize;
+		block += wsize;
+	}
+	return 0;
 }
 
 typedef struct {
