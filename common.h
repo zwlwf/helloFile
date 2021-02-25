@@ -1,6 +1,7 @@
 #ifndef _COMMON_H
 #define _COMMON_H
 #include <unistd.h>
+#include <time.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -9,9 +10,19 @@
 #include <netinet/in.h>
 #include <ctype.h>
 
-#include "config.h"
+//#include "config.h"
 const char PUSHCHAR = '1';
 const char PULLCHAR = '0';
+const int MAXSIZE = 300<<20; // Set max size of file to 300M
+
+void Log(const char* message) {
+	FILE *fp = fopen("helloFile.log","a+");
+	char ts[100];
+	time_t now = time(NULL);
+	strftime(ts, 100, "%D", localtime(&now));
+	fprintf(fp, "[%s ]%s\n",ts, message);
+	fclose(fp);
+}
 
 int receiveInt(int sock) {
 	int n;
@@ -64,6 +75,17 @@ void sendPackage( int sock, Package p ) {
 Package recvPackage( int sock) {
 	Package ans;
 	ans.size = receiveInt(sock);
+	if(ans.size <= 0) {
+		Log("Error : package with negetive size ignored!\n");
+		ans.size = 0;
+		ans.block = NULL;
+		return ans;
+	} else if( ans.size> MAXSIZE) {
+		Log("Error : package with too large size ignored!\n");
+		ans.size = 0;
+		ans.block = NULL;
+		return ans;
+	}
 	printf("receiving %d bytes data\n",ans.size);
 	ans.block = readBlock(sock, ans.size);
 	printf("received %d bytes data\n",ans.size);
@@ -74,6 +96,10 @@ Package recvPackage( int sock) {
 
 void readIP(char* s) {
 	FILE *fp = fopen(configFile,"r");
+	if(!fp) {
+		printf("Failed to read config\n");
+		exit(-1);
+	}
 	char line[512]={0};
 	char pattern[100] = "IP";
 	while( fgets(line, 512, fp) != NULL ) {
@@ -92,11 +118,16 @@ void readIP(char* s) {
 			break;
 		}
 	}
+	*s = 0;
 	fclose(fp);
 }
 
 short readPort() {
 	FILE *fp = fopen(configFile,"r");
+	if(!fp) {
+		printf("Failed to read config\n");
+		exit(-1);
+	}
 	char line[512]={0};
 	char pattern[20] = "PORT";
 	int ans = 0;
@@ -114,7 +145,7 @@ short readPort() {
 			break;
 		}
 	}
-	return ans;
 	fclose(fp);
+	return ans;
 }
 #endif

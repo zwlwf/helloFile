@@ -17,11 +17,12 @@ int createSock_client() {
 	struct sockaddr_in sock_addr;
 	memset(&sock_addr, 0, sizeof(sock_addr));
 	sock_addr.sin_family = AF_INET;
-	//
-	//short port=6667;
-	//char ipstr[20]="47.104.98.157";
-	//readIP(ipstr);
-	//port = readPort();
+	
+	short port=6667;
+	char ipstr[20]="47.104.98.157";
+	readIP(ipstr);
+	port = readPort();
+	//printf("Ip = %s , port = %d", ipstr, port);
 	sock_addr.sin_port = htons(port);
 	sock_addr.sin_addr.s_addr = inet_addr(ipstr);
 

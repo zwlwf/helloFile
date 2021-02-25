@@ -8,7 +8,8 @@ int createSock_srv(){
 	memset(&addr, 0, sizeof(addr) );
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = htonl( INADDR_ANY );
-	addr.sin_port = htons( port );
+	//addr.sin_port = htons( port );
+	addr.sin_port = htons( readPort() );
 	int err = bind(sock, (struct sockaddr*)&addr, sizeof(addr) );
 	if(err<0) {
 		printf("bind error \n");
@@ -30,7 +31,11 @@ int waitConnect( int sock ) {
 		client_sock = accept(sock, (struct sockaddr*)&client_addr, &client_addr_size);
 		if( client_sock >=0 ) break;
 	}
-
+	char buffer[1024];
+	char buffer2[2024];
+	inet_ntop(AF_INET, &client_addr.sin_addr, buffer, sizeof(buffer));
+	sprintf(buffer2," visitor: %s",buffer);
+	Log(buffer2);
 	return client_sock;
 }
 
