@@ -8,8 +8,8 @@ int createSock_srv(){
 	memset(&addr, 0, sizeof(addr) );
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = htonl( INADDR_ANY );
-	//addr.sin_port = htons( port );
-	addr.sin_port = htons( readPort() );
+	addr.sin_port = htons( port );
+	//addr.sin_port = htons( readPort() );
 	int err = bind(sock, (struct sockaddr*)&addr, sizeof(addr) );
 	if(err<0) {
 		printf("bind error \n");

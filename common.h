@@ -10,7 +10,7 @@
 #include <netinet/in.h>
 #include <ctype.h>
 
-//#include "config.h"
+#include "config.h"
 const char PUSHCHAR = '1';
 const char PULLCHAR = '0';
 const int MAXSIZE = 300<<20; // Set max size of file to 300M
@@ -19,7 +19,7 @@ void Log(const char* message) {
 	FILE *fp = fopen("helloFile.log","a+");
 	char ts[100];
 	time_t now = time(NULL);
-	strftime(ts, 100, "%D", localtime(&now));
+	strftime(ts, 100, "%D %H:%M:%S", localtime(&now));
 	fprintf(fp, "[%s ]%s\n",ts, message);
 	fclose(fp);
 }
