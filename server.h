@@ -40,9 +40,21 @@ int waitConnect( int sock ) {
 }
 
 char readHello( int client_sock ) {
-	char c;
-	int t = recv(client_sock, (void*)&c, 1, 0);
-	return c;
+	char s[100]={0};
+	time_t pre = time(NULL);
+	while(1) {
+		int t = recv(client_sock, s, 5, MSG_DONTWAIT);
+		if(t>0) 
+			break;
+		else {
+			time_t now = time(NULL);
+			if(now-pre>3) // wait at most 3 seconds
+				break;
+		}
+	}
+	if(strcmp(s, "@PUSH")==0) return PUSHCHAR;
+	else if(strcmp(s,"@PULL")==0) return PULLCHAR;
+	else return '2';
 }
 
 typedef struct _queue {

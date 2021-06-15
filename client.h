@@ -44,7 +44,12 @@ char dealWithInput(int argc, char** argv) {
 }
 
 int sayHello( int sock, char c ) {
-	return send(sock, (void*) &c, 1, 0);
+	char s[100];
+	if(c==PUSHCHAR) 
+		strcpy(s,"@PUSH");
+	else
+		strcpy(s,"@PULL");
+	return send(sock, s, strlen(s), 0);
 }
 
 Package tar(int n, char** fnames) {
