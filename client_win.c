@@ -22,6 +22,15 @@ void sendInt(int sock, int a) {
 	}
 }
 
+int sayHello( int sock, char c ) {
+	char s[100];
+	if(c==PUSHCHAR) 
+		strcpy(s,"@PUSH");
+	else
+		strcpy(s,"@PULL");
+	return send(sock, s, strlen(s), 0);
+}
+
 void sendChar(int sock, char c) {
 	int nwrite = send(sock, (void*)&c, sizeof(char), 0);
 	if( nwrite== -1 ) {
@@ -61,7 +70,8 @@ void pull(int sock) {
 	// 想拉东西前，跟服务器打个招呼
 	//int send_buffer = 0;
 	//setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&send_buffer, 1);
-	sendChar(sock, PULLCHAR); // 这里应该是client就一个字符没发出去，导致server没收到，对于push，最后sock已经关闭了，没有这个问题，pull有个这个问题。
+	//sendChar(sock, PULLCHAR); // 这里应该是client就一个字符没发出去，导致server没收到，对于push，最后sock已经关闭了，没有这个问题，pull有个这个问题。
+	sayHello(sock, PULLCHAR); 
     int bufferSize = receiveInt(sock);
 	void* block = readBlock(sock, bufferSize);
 	uint32_t fnum;
@@ -129,7 +139,7 @@ int push(int sock, int n, char** fnames) {
 		fclose(fp);
 	}
 
-	sendChar(sock, PUSHCHAR);
+	sayHello(sock, PUSHCHAR);
 	sendInt(sock, bufferSize);
 	int nWrite = send(sock, buffer, bufferSize, 0 );
 	printf("send by windows %d bytes\n", nWrite);
