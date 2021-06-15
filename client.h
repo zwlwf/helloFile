@@ -14,19 +14,24 @@ static void helper() {
 
 int createSock_client() {
 	int sock = socket( AF_INET, SOCK_STREAM, 0);
-	struct sockaddr_in sock_addr;
-	memset(&sock_addr, 0, sizeof(sock_addr));
-	sock_addr.sin_family = AF_INET;
+	struct addrinfo *result = NULL,hints;
 	
+	// // read ip and port from config
 	//short port=6667;
-	//char ipstr[20]="47.104.98.157";
+	//char ipstr[20];
 	//readIP(ipstr);
 	//port = readPort();
 	//printf("Ip = %s , port = %d", ipstr, port);
-	sock_addr.sin_port = htons(port);
-	sock_addr.sin_addr.s_addr = inet_addr(ipstr);
-
-	int flag = connect(sock, (struct sockaddr*)&sock_addr, sizeof(sock_addr) );
+	memset(&hints, 0, sizeof(struct addrinfo));
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	int iresult = getaddrinfo(ipstr, portstr, &hints, &result);
+	
+	if(iresult!=0 ){
+		printf("getaddrinfo fault\n");
+		return -1;
+	}
+	int flag = connect(sock, (struct sockaddr*)(result->ai_addr), sizeof(struct sockaddr) );
 	if(flag ){
 		printf("connection failed \n");
 		return -1;

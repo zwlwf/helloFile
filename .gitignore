@@ -6,3 +6,6 @@
 *.exe
 *.so
 *.obj
+
+*.bak
+helloFile*

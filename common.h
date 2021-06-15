@@ -1,5 +1,7 @@
 #ifndef _COMMON_H
 #define _COMMON_H
+#define _POSIX_C_SOURCE 200112L
+#include <sys/types.h>
 #include <unistd.h>
 #include <time.h>
 #include <stdio.h>
@@ -7,6 +9,7 @@
 #include <stdlib.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <ctype.h>
 

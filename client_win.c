@@ -4,6 +4,7 @@
 #include <IPHlpApi.h>
 #include <stdio.h>
 #pragma comment(lib, "Ws2_32.lib")
+#include "config.h"
 #define DEFAULT_PORT "6667"
 typedef unsigned int uint32_t;
 const char PUSHCHAR = '1';
