@@ -79,7 +79,7 @@ void pull(int sock) {
     int bufferSize = receiveInt(sock);
 	void* block = readBlock(sock, bufferSize);
 	if(!block) {
-		printf("no files in queue on server");
+		printf("no files in queue on server\n");
 		return;
 	}
 	uint32_t fnum;

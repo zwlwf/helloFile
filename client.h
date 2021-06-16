@@ -101,7 +101,7 @@ Package tar(int n, char** fnames) {
 void untar(Package p) {
 	void *block = p.block;
 	if(!block) {
-		printf("no files in queue on server");
+		printf("no files in queue on server\n");
 		return;
 	}
 	uint32_t fnum;
