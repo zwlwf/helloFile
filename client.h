@@ -100,6 +100,10 @@ Package tar(int n, char** fnames) {
 
 void untar(Package p) {
 	void *block = p.block;
+	if(!block) {
+		printf("no files in queue on server");
+		return;
+	}
 	uint32_t fnum;
 	uint32_t pos = 0;
 	memcpy((void *)&fnum, block, sizeof(uint32_t));

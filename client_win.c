@@ -60,6 +60,7 @@ static int receiveInt(int client_sock) {
 }
 
 static void* readBlock(int client_sock, int len) {
+		if(len == 0) return NULL;
         void *buffer = malloc(len);
         void *p = buffer;
         while(len>0) {
@@ -77,6 +78,10 @@ void pull(int sock) {
 	sayHello(sock, PULLCHAR); 
     int bufferSize = receiveInt(sock);
 	void* block = readBlock(sock, bufferSize);
+	if(!block) {
+		printf("no files in queue on server");
+		return;
+	}
 	uint32_t fnum;
 	uint32_t pos = 0;
 	memcpy((void *)&fnum, block, sizeof(uint32_t));
