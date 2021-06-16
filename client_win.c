@@ -1,3 +1,5 @@
+#define _WIN32_WINNT 0x0501 // for useof getaddrinfo and freeaddrinfo
+#include <errno.h>
 #include <WinSock2.h>
 #include <windows.h>
 #include <WS2tcpip.h>
@@ -5,7 +7,6 @@
 #include <stdio.h>
 #pragma comment(lib, "Ws2_32.lib")
 #include "config.h"
-#define DEFAULT_PORT "6667"
 typedef unsigned int uint32_t;
 const char PUSHCHAR = '1';
 const char PULLCHAR = '0';
@@ -14,7 +15,7 @@ void sendInt(int sock, int a) {
 	int b = htonl(a);
 	int nwrite = send(sock, (void*)&b, sizeof(int), 0);
 	if( nwrite== -1 ) {
-		if(EINTR == errno || EWOULDBLOCK == errno || EAGAIN == errno ) {
+		if(EINTR == errno || EAGAIN == errno ) {
 			nwrite = 0;
 		} else {
 			printf("%s,%d, Send() -1, 0x%x\n", __FILE__, __LINE__, errno);
@@ -32,6 +33,7 @@ int sayHello( int sock, char c ) {
 	return send(sock, s, strlen(s), 0);
 }
 
+/*
 void sendChar(int sock, char c) {
 	int nwrite = send(sock, (void*)&c, sizeof(char), 0);
 	if( nwrite== -1 ) {
@@ -43,6 +45,7 @@ void sendChar(int sock, char c) {
 		}
 	}
 }
+*/
 
 const int MSG_DONTWAIT = 0;
 typedef struct _fdata {
@@ -71,7 +74,6 @@ void pull(int sock) {
 	// 想拉东西前，跟服务器打个招呼
 	//int send_buffer = 0;
 	//setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&send_buffer, 1);
-	//sendChar(sock, PULLCHAR); // 这里应该是client就一个字符没发出去，导致server没收到，对于push，最后sock已经关闭了，没有这个问题，pull有个这个问题。
 	sayHello(sock, PULLCHAR); 
     int bufferSize = receiveInt(sock);
 	void* block = readBlock(sock, bufferSize);
@@ -173,7 +175,7 @@ int main(int argc, char** argv)
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 	
-	iResult = getaddrinfo("47.104.98.157", DEFAULT_PORT, &hints, &result);
+	iResult = getaddrinfo(ipstr, portstr, &hints, &result);
 	if (iResult != 0) {
 		printf("getaddrinfo failed: %d\n", iResult);
 		WSACleanup();
