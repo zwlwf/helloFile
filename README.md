@@ -25,5 +25,5 @@ pull  # receive files
 
 Note: the server address used by clients is designed in config.h file and compiled into executive file so that we can run client everywhere we want.
 
-## test/python
+## test/client.py
 This shows an example of python, that can pull/push data between processes on different hosts.
