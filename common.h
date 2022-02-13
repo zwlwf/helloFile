@@ -16,8 +16,44 @@
 #include "config.h"
 const char PUSHCHAR = '1';
 const char PULLCHAR = '0';
-const int MAXSIZE = 300<<20; // Set max size of file to 300M
+const int MAXSIZE = 3<<30; // Set max size of file to 300M
 
+char* readLine(FILE* fp) {
+	size_t alloc_length = 1024;
+	size_t data_length = 0;
+	char* data = (char*) malloc(alloc_length);
+	char *cursor = data;
+	while(1) {
+		cursor = data + data_length;
+		char* line = fgets(cursor, alloc_length - data_length, fp);
+		if(!line) { // error or read no char and meet an eof
+			free(data);
+			return NULL;
+		}
+		data_length += strlen(cursor);
+		if( data_length +1 < alloc_length || data[data_length-1] == '\n' ) { // read a enter or EOF
+			break;
+		}
+		alloc_length <<= 1;
+		data = realloc(data, alloc_length);
+		if( !data ) { // malloc failed 
+			data = NULL;
+			break;
+		}
+	}
+	data = realloc(data, data_length+1);
+	return data;
+}
+
+int main() {
+	char *p = NULL;
+	while( p = readLine() ) {
+		printf("%s", p);
+		free(p);
+		p = NULL;
+	}
+	return 0;
+}
 void Log(const char* message) {
 	FILE *fp = fopen("helloFile.log","a+");
 	char ts[100];
