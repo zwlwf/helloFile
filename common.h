@@ -45,15 +45,6 @@ char* readLine(FILE* fp) {
 	return data;
 }
 
-int main() {
-	char *p = NULL;
-	while( p = readLine() ) {
-		printf("%s", p);
-		free(p);
-		p = NULL;
-	}
-	return 0;
-}
 void Log(const char* message) {
 	FILE *fp = fopen("helloFile.log","a+");
 	char ts[100];
