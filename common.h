@@ -65,7 +65,7 @@ void* readBlock(int sock, int len) {
 	void *p = buffer;
 	while(len>0) {
 		int rsize = read(sock, p, len);
-		printf("rsize = %d\n",rsize);
+		//printf("rsize = %d\n",rsize);
 		len-=rsize;
 		p+=rsize;
 	}
@@ -105,7 +105,6 @@ void sendPackage( int sock, Package p ) {
 Package recvPackage( int sock) {
 	Package ans;
 	ans.size = receiveInt(sock);
-	printf("ans.size = %d\n", ans.size);
 	if(ans.size <= 0) {
 		Log("Error : package with negetive size ignored!\n");
 		ans.size = 0;
@@ -117,9 +116,9 @@ Package recvPackage( int sock) {
 		ans.block = NULL;
 		return ans;
 	}
-	printf("receiving %d bytes data\n",ans.size);
+	//printf("receiving %d bytes data\n",ans.size);
 	ans.block = readBlock(sock, ans.size);
-	printf("received %d bytes data\n",ans.size);
+	//printf("received %d bytes data\n",ans.size);
 	return ans;
 }
 

@@ -146,7 +146,7 @@ void untar(Package p) {
 	memcpy((void *)&fnum, block, sizeof(uint32_t));
 	fnum = ntohl(fnum);
 	pos+=sizeof(uint32_t);
-	printf(" files number = %u \n", fnum);
+	// printf(" files number = %u \n", fnum);
 	fdata fd;
 	char fname[200];
 	for(int i=0; i<fnum; i++) {

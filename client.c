@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
 		sayHello(sock, PULLCHAR); // 先发给招呼，要pull
 		Package p = recvPackage(sock); // 收包
 		untar(p); // 解压包，进一步处理
-		printf("------- pull over ------- \n");
+		//printf("------- pull over ------- \n");
 	}
 	close(sock);
 }
