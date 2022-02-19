@@ -57,7 +57,44 @@ int sayHello( int sock, char c ) {
 	return send(sock, s, strlen(s), 0);
 }
 
+unsigned char* readUntilEOF() {
+    int data_length=0;
+    int alloc_length = 1024;
+    char *data = (char*) malloc( alloc_length );
+    char c;
+    while( ( c = fgetc(stdin)) != EOF ) {
+        if(data_length + 1 > alloc_length) {
+            alloc_length <<=1;
+            data = realloc(data, alloc_length);
+        }
+        data[data_length++] = c;
+    }
+    data[data_length] = '\0';
+    return data;
+}
+
+Package tar_stdin() {
+	unsigned char* buffer;
+	uint32_t fnum = htonl(1);
+	uint32_t fname_length = htonl(0);
+	unsigned char* data = readUntilEOF();
+	size_t data_length = strlen(data)+1;
+	uint32_t data_length_send = htonl(data_length);
+	size_t bufferSize = 3*sizeof(uint32_t) + data_length;
+	buffer = (unsigned char*) malloc(bufferSize);
+	memcpy(buffer, (const void*)&fnum, sizeof(uint32_t));
+	memcpy(buffer+sizeof(uint32_t), (const void*)&fname_length, sizeof(uint32_t));
+	memcpy(buffer+2*sizeof(uint32_t), (const void*)&data_length_send, sizeof(uint32_t));
+	memcpy(buffer+3*sizeof(uint32_t), (const void*)data, data_length);
+	free(data);
+	Package ans;
+	ans.size = bufferSize;
+	ans.block = buffer;
+	return ans;
+}
+	
 Package tar(int n, char** fnames) {
+	if(n==0) return tar_stdin();
 	unsigned char *buffer;
 	size_t bufferSize = sizeof(uint32_t); // the first data is the number fof files
 	uint32_t fnum = n;
@@ -117,16 +154,21 @@ void untar(Package p) {
 		pos+=sizeof(fdata);
 		fd.nameSize = ntohl(fd.nameSize);
 		fd.dataSize = ntohl(fd.dataSize);
-		memcpy(fname, block+pos, fd.nameSize);
-		fname[fd.nameSize] = '\0';
-		printf("reading file: %s\n", fname);
-		pos+=fd.nameSize;
-		// write the data of bloc to file?
-		FILE *fp = fopen(fname, "wb");
-		if(fp) {
-			fwrite(block+pos, fd.dataSize, sizeof(void), fp);
+		if(fd.nameSize) {
+			memcpy(fname, block+pos, fd.nameSize);
+			fname[fd.nameSize] = '\0';
+			printf("reading file: %s\n", fname);
+			pos+=fd.nameSize;
+			// write the data of bloc to file?
+			FILE *fp = fopen(fname, "wb");
+			if(fp) {
+				fwrite(block+pos, fd.dataSize, sizeof(void), fp);
+			}
+			fclose(fp);
+		} else { // untar the data from stdin
+			printf("%s",(char*)block+pos);
+			pos+=fd.dataSize;
 		}
-		fclose(fp);
 		pos+=fd.dataSize;
 	}
 	free(block);

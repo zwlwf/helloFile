@@ -5,6 +5,27 @@
 2. server.c : server for Linux
 3. client_win.c : client for Windows
 
+## Data format
+Package size(big endian)
+Package data:
+	file number
+	file_1's name length
+	file_1's data length
+	file_1's name
+	file_1's data
+	...
+	file_n's name length
+	file_n's data length
+	file_n's name
+	file_n's data
+
+if data is from stdin, the name is empty. 
+
+1
+0
+length
+data[length]
+
 ## Usage
 ```bash
 make

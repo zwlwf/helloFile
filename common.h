@@ -16,7 +16,7 @@
 #include "config.h"
 const char PUSHCHAR = '1';
 const char PULLCHAR = '0';
-const int MAXSIZE = 3<<30; // Set max size of file to 300M
+const int MAXSIZE = 2147483640; // Set max size of file to 300M
 
 char* readLine(FILE* fp) {
 	size_t alloc_length = 1024;
@@ -105,6 +105,7 @@ void sendPackage( int sock, Package p ) {
 Package recvPackage( int sock) {
 	Package ans;
 	ans.size = receiveInt(sock);
+	printf("ans.size = %d\n", ans.size);
 	if(ans.size <= 0) {
 		Log("Error : package with negetive size ignored!\n");
 		ans.size = 0;
